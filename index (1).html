@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEL — Azure Egoist League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Russo+One&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* тут правил глеб, не трогать */
+  :root{
+    --bg:#070a14;
+    --panel:#0d1322;
+    --line:#1b2338;
+    --txt:#e8ecf6;
+    --dim:#8a93ad;
+    --blue:#3d6bff;
+    --gold:#ffd23f;
+    --red:#ff4d5e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:'Golos Text',sans-serif;
+    overflow-x:hidden;
+  }
+  /* шум поверх всего — чтобы фон не был мёртвым */
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+  a{color:inherit}
+
+  /* ---------- шапка ---------- */
+  header{
+    position:sticky;top:0;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 6vw;
+    background:rgba(7,10,20,.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .logo{
+    font-family:'Russo One',sans-serif;
+    font-size:22px;letter-spacing:2px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .logo b{
+    background:var(--blue);color:#fff;
+    padding:2px 8px;transform:skewX(-8deg);
+  }
+  nav{display:flex;gap:26px;font-size:14px;font-weight:600;color:var(--dim)}
+  nav a{text-decoration:none;transition:color .2s}
+  nav a:hover{color:var(--gold)}
+
+  /* ---------- герой ---------- */
+  .hero{
+    min-height:78vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:60px 6vw;
+    position:relative;
+  }
+  /* синий мазок за заголовком — как краска кистью */
+  .hero::before{
+    content:'';position:absolute;
+    top:14%;right:-6%;width:46vw;height:46vw;max-width:640px;max-height:640px;
+    background:radial-gradient(circle,rgba(61,107,255,.22),transparent 62%);
+    transform:rotate(12deg);pointer-events:none;
+  }
+  .kicker{
+    font-size:13px;letter-spacing:5px;text-transform:uppercase;
+    color:var(--dim);margin-bottom:18px;
+  }
+  .kicker em{color:var(--gold);font-style:normal}
+  h1{
+    font-family:'Russo One',sans-serif;
+    font-size:clamp(44px,7.4vw,96px);
+    line-height:1.02;letter-spacing:-1px;
+    max-width:12ch;
+  }
+  h1 .stroke{
+    color:transparent;
+    -webkit-text-stroke:2px var(--blue);
+  }
+  .sub{
+    margin-top:22px;color:var(--dim);
+    font-size:17px;max-width:44ch;line-height:1.6;
+  }
+  .cta{
+    margin-top:40px;
+    display:inline-flex;align-items:center;gap:14px;
+    width:fit-content;
+    font-family:'Russo One',sans-serif;
+    font-size:18px;letter-spacing:1.5px;
+    color:#fff;text-decoration:none;
+    background:var(--blue);
+    padding:18px 40px;
+    transform:skewX(-8deg);
+    box-shadow:6px 6px 0 rgba(61,107,255,.28);
+    transition:transform .15s,box-shadow .15s,background .15s;
+  }
+  .cta span{display:block;transform:skewX(8deg)}
+  .cta:hover{
+    background:var(--gold);color:#0a0a0a;
+    transform:skewX(-8deg) translate(-2px,-2px);
+    box-shadow:9px 9px 0 rgba(255,210,63,.25);
+  }
+  .cta:active{transform:skewX(-8deg) translate(2px,2px);box-shadow:2px 2px 0 rgba(61,107,255,.28)}
+  .hero .note{
+    margin-top:18px;font-size:13px;color:var(--dim);max-width:52ch;line-height:1.6;
+  }
+  .hero .note b{color:var(--txt);font-weight:600}
+
+  /* ---------- бегущая строка ---------- */
+  .ticker{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    overflow:hidden;white-space:nowrap;
+    padding:12px 0;
+    font-family:'Russo One',sans-serif;font-size:13px;letter-spacing:3px;
+    color:var(--dim);
+  }
+  .ticker div{display:inline-block;animation:run 26s linear infinite}
+  @keyframes run{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  .ticker i{color:var(--blue);font-style:normal;margin:0 18px}
+
+  /* ---------- секции ---------- */
+  section{padding:80px 6vw}
+  h2{
+    font-family:'Russo One',sans-serif;
+    font-size:clamp(28px,4vw,44px);
+    margin-bottom:10px;
+  }
+  .mark{position:relative;display:inline-block;z-index:1}
+  .mark::after{
+    content:'';position:absolute;left:-6px;right:-10px;bottom:4px;
+    height:12px;background:var(--gold);z-index:-1;
+    transform:rotate(-1.2deg);
+  }
+  .lead{color:var(--dim);margin-bottom:36px;max-width:60ch;line-height:1.6}
+
+  /* ---------- рейтинг ---------- */
+  .rating-meta{
+    display:flex;gap:22px;flex-wrap:wrap;
+    font-size:13px;color:var(--dim);margin-bottom:26px;
+  }
+  .rating-meta b{color:var(--txt);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  thead th{
+    text-align:left;padding:12px 14px;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--dim);border-bottom:1px solid var(--line);
+  }
+  tbody td{padding:14px;border-bottom:1px solid var(--line)}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:rgba(61,107,255,.06)}
+  .num{color:var(--dim);width:46px}
+  .top1 td:first-child{color:var(--gold);font-weight:700}
+  .top2 td:first-child{color:#c9d2e8;font-weight:700}
+  .top3 td:first-child{color:#d38b5c;font-weight:700}
+  .rank-chip{
+    display:inline-block;padding:3px 10px;font-size:12px;font-weight:600;
+    border:1px solid;border-radius:3px;transform:skewX(-6deg);
+  }
+  .r-herald{color:#8a93ad;border-color:#3a4358}
+  .r-guardian{color:#5fbf6e;border-color:#2e5c38}
+  .r-crusader{color:#4da3d8;border-color:#2a546f}
+  .r-archon{color:#a97ee0;border-color:#543a78}
+  .r-legend{color:#e0a54d;border-color:#6e5227}
+  .r-divine{color:#e05563;border-color:#6e2a31}
+  .r-immortal{color:var(--gold);border-color:var(--gold)}
+  .elo{font-family:'Russo One',sans-serif;font-size:17px}
+  .wl{color:var(--dim);font-size:13px}
+  .empty-msg{
+    padding:44px 20px;text-align:center;color:var(--dim);
+    border:1px dashed var(--line);
+    font-size:15px;line-height:1.7;
+  }
+  .empty-msg b{color:var(--txt)}
+
+  /* ---------- правила ---------- */
+  .rules-grid{
+    display:grid;gap:22px;
+    grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+  }
+  .rule{
+    background:var(--panel);border:1px solid var(--line);
+    padding:26px 24px 24px;position:relative;
+  }
+  .rule:nth-child(odd){transform:rotate(-.4deg)}
+  .rule:nth-child(even){transform:rotate(.35deg)}
+  .rule:hover{transform:rotate(0) translateY(-3px);border-color:var(--blue)}
+  .rule{transition:transform .2s,border-color .2s}
+  .rule .n{
+    font-family:'Russo One',sans-serif;font-size:13px;
+    color:var(--gold);letter-spacing:2px;margin-bottom:12px;display:block;
+  }
+  .rule h3{font-size:17px;margin-bottom:10px;letter-spacing:.3px}
+  .rule p{color:var(--dim);font-size:14px;line-height:1.65}
+  .rule p b{color:var(--txt);font-weight:600}
+
+  /* ---------- футер ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:44px 6vw 60px;
+    display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;
+  }
+  footer .f-logo{font-family:'Russo One',sans-serif;letter-spacing:2px;font-size:16px}
+  footer p{color:var(--dim);font-size:13px;line-height:1.7}
+  footer .hand{
+    font-style:italic;color:var(--gold);
+    transform:rotate(-1deg);display:inline-block;font-size:14px;
+  }
+
+  @media(max-width:640px){
+    nav{display:none}
+    .cta{width:100%;justify-content:center}
+    section{padding:60px 6vw}
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<header>
+  <div class="logo"><b>AEL</b> AZURE EGOIST LEAGUE</div>
+  <nav>
+    <a href="#rating">Рейтинг</a>
+    <a href="#rules">Правила</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <p class="kicker">azure egoist league <em>//</em> roblox · blue lock</p>
+  <h1>Съешь или <span class="stroke">будешь съеден.</span></h1>
+  <p class="sub">Своя лига по Blue Lock. Свои команды, свои эго, свои этапы — от Первого отбора до U-20. Проиграл — это не конец, это просто другая дверь.</p>
+  <a class="cta" href="https://www.roblox.com/share?code=e0700769bf3f5c408b21f33eeb5388a4&type=Server" target="_blank" rel="noopener"><span>НАЧАТЬ МАТЧ</span></a>
+  <p class="note">кнопка кидает в приватку · слот на матч — <b>2 часа</b> · опоздал командой на <b>10 минут</b> — техпоражение, без «ну ещё пять минуточек»</p>
+</section>
+
+<div class="ticker"><div>FIRST SELECTION <i>//</i> SECOND SELECTION <i>//</i> WILDCARD <i>//</i> U-20 <i>//</i> FIRST SELECTION <i>//</i> SECOND SELECTION <i>//</i> WILDCARD <i>//</i> U-20 <i>//</i>&nbsp;</div></div>
+
+<section id="rating">
+  <h2><span class="mark">Рейтинг</span></h2>
+  <p class="lead">Эло как в доте. Играл — получи цифру, с которой не стыдно ходить в чат.</p>
+  <div class="rating-meta">
+    <span>обновлено: <b id="updated">—</b></span>
+    <span>старт для всех — <b>1000 ELO</b></span>
+    <span>победа <b>+25</b> · поражение <b>−25</b></span>
+  </div>
+  <table id="table">
+    <thead>
+      <tr><th class="num">#</th><th>Игрок</th><th>Ранг</th><th>ELO</th><th>Матчи</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty-msg" id="empty" hidden>
+    Пока никто не сыграл рейтинговый матч.<br>
+    <b>Будь первым — это бесплатная слава.</b>
+  </div>
+</section>
+
+<section id="rules">
+  <h2><span class="mark">Как это работает</span></h2>
+  <p class="lead">Коротко и без канцелярита. Полный регламент живёт в Discord — здесь только то, что реально нужно перед матчем.</p>
+  <div class="rules-grid">
+    <div class="rule">
+      <span class="n">01</span>
+      <h3>Матч</h3>
+      <p><b>4 на 4, без вратаря</b> на первом этапе — все в поле. Матч идёт <b>до двух побед в раундах</b>: проиграл раунд — соберись, счёт 1:1 ещё ни о чём не говорит. Третий раунд решает всё.</p>
+    </div>
+    <div class="rule">
+      <span class="n">02</span>
+      <h3>Стили</h3>
+      <p>На 1 этапе — только Исаги, Гагамару, Бачира, Чигири, Кунигами, Бароу, Наги, Рео, Отоя, Карасу, Курона, Киёра, Хиори. Стили <b>не повторяются</b> внутри команды, защитных на поле — <b>максимум два</b>. Кайзер, Рин, Сае и прочие мастера ждут своего этапа.</p>
+    </div>
+    <div class="rule">
+      <span class="n">03</span>
+      <h3>Опоздание</h3>
+      <p>Нет команды через <b>10 минут</b> после начала слота — техпоражение. Судья и соперник не обязаны ждать твои обстоятельства.</p>
+    </div>
+    <div class="rule">
+      <span class="n">04</span>
+      <h3>Проиграл — не вылетел</h3>
+      <p>Проигравшие идут в <b>утешительный раунд</b>: второй слот в следующем этапе ещё можно взять. Дальше — <b>вайлдкард</b>: отдельный турнир, где проигравшие во Втором отборе бьются за возврат. Канон уважает вторые шансы.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="f-logo">AEL</div>
+    <p>Azure Egoist League · Roblox</p>
+  </div>
+  <p>
+    сайт собран руками админа, а не конструктором —<br>
+    <span class="hand">нашёлся баг? напиши. починю. или сломаю ещё сильнее.</span>
+  </p>
+</footer>
+
+<script>
+  /* рейтинг тянем из rating.json рядом с сайтом.
+     обновил файл — перезалил в репозиторий — у всех новая таблица. всё. */
+  fetch('rating.json', {cache:'no-store'})
+    .then(r => { if(!r.ok) throw 0; return r.json(); })
+    .then(data => {
+      if(data.updated) document.getElementById('updated').textContent = data.updated;
+      const players = (data.players || []).slice().sort((a,b) => b.elo - a.elo);
+      const rows = document.getElementById('rows');
+      if(!players.length){
+        document.getElementById('table').hidden = true;
+        document.getElementById('empty').hidden = false;
+        return;
+      }
+      players.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        if(i === 0) tr.className = 'top1';
+        else if(i === 1) tr.className = 'top2';
+        else if(i === 2) tr.className = 'top3';
+        tr.innerHTML =
+          '<td class="num">' + (i + 1) + '</td>' +
+          '<td><b>' + escapeHtml(p.name) + '</b></td>' +
+          '<td><span class="rank-chip ' + rankClass(p.elo) + '">' + rankName(p.elo) + '</span></td>' +
+          '<td class="elo">' + p.elo + '</td>' +
+          '<td class="wl">' + (p.wins || 0) + 'W · ' + (p.losses || 0) + 'L</td>';
+        rows.appendChild(tr);
+      });
+    })
+    .catch(() => {
+      document.getElementById('table').hidden = true;
+      document.getElementById('empty').hidden = false;
+      document.getElementById('updated').textContent = '—';
+    });
+
+  function rankName(elo){
+    if(elo >= 2600) return 'IMMORTAL';
+    if(elo >= 2300) return 'DIVINE';
+    if(elo >= 2000) return 'LEGEND';
+    if(elo >= 1700) return 'ARCHON';
+    if(elo >= 1400) return 'CRUSADER';
+    if(elo >= 1100) return 'GUARDIAN';
+    return 'HERALD';
+  }
+  function rankClass(elo){
+    return 'r-' + rankName(elo).toLowerCase();
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+</script>
+</body>
+</html>
